@@ -3,6 +3,7 @@ from math import exp, log
 import numpy as np
 from scipy.optimize import minimize
 from collections import defaultdict
+import datetime
 
 LAMBDA = 6
 
@@ -176,16 +177,15 @@ class Model:
         return ret
 
     def train(self):
+        print('start time: {}'.format(datetime.datetime.now()))
         self.v = minimize(self.L, np.zeros(self.int), method='L-BFGS-B', jac=self.dLdv)
+        print('end time: {}'.format(datetime.datetime.now()))
         self.v.dump('v.dat')
 
 
-
-
-
-
-all_sentences = parse('train.wtag')
-mymodel = Model(all_sentences).train()
-a=1
+if __name__ == '__main__':
+    all_sentences = parse('train.wtag')
+    mymodel = Model(all_sentences).train()
+    a=1
 
 
