@@ -123,8 +123,8 @@ class Model:
             for j in range(len(self.train_sentences[i])):
                 for tag in self.set_of_tags:
                     features = self.feature_extractor(self.train_sentences[i], self.train_tags[i], j, tag)
-                    for k in range(self.int):
-                        features[k] *= self.calculate_probability(tag, self.train_sentences[i], self.train_tags[i], j, v)
+                    prob = self.calculate_probability(tag, self.train_sentences[i], self.train_tags[i], j, v)
+                    features = features * prob
                     expected_counts = np.add(expected_counts, features)
 
         return self.sum_of_features - expected_counts - (LAMBDA*v)
