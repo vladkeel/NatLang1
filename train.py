@@ -1,22 +1,21 @@
 from parser import parse
 from math import exp, log
 import numpy as np
-from scipy.optimize import minimize
+# from scipy.optimize import minimize
 from collections import defaultdict
 import datetime
 import logging
 import sys
 import functools
 import time
+import coloredlogs
+from scipy.optimize import fmin_l_bfgs_b as minimize
 
-FORMAT = '%(asctime)-15s %(message)s'
+
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler(sys.stdout)
-formater = logging.Formatter(FORMAT)
-handler.setFormatter(formater)
-logger.addHandler(handler)
-LAMBDA = 0
+coloredlogs.install(level='DEBUG')
+coloredlogs.install(level='DEBUG', logger=logger)
+LAMBDA = 3
 iteration_number = 1
 
 
@@ -28,13 +27,14 @@ def timer(func):
         value = func(*args, **kwargs)
         end_time = time.perf_counter()
         run_time = end_time - start_time
-        logger.info(f"Finished {func.__name__!r} in {str(datetime.timedelta(seconds=run_time))}")
+        logger.warning(f"Finished {func.__name__!r} in {str(datetime.timedelta(seconds=run_time))}")
         return value
     return wrapper_timer
 
 
 class Model:
     def __init__(self, train_data):
+        self.iteration_number = 1
         self.set_of_tags = set()
         self.train_sentences = []
         self.train_tags = []
@@ -66,6 +66,13 @@ class Model:
 
         mone = exp(sum([v[x] for x in self.feature_extractor(words, tags, idx, tag)]))
         return mone / mahane
+
+    def calculate_log_probability(self, tag, words, tags, idx, v, mahane):
+        try:
+            mone = sum([v[x] for x in self.feature_extractor(words, tags, idx, tag)])
+            return mone - log(mahane)
+        except:
+            logger.critical("mahane is negative: {}".format(mahane))
 
     def feature_collector(self, words, tags, idx):
         current_tag = tags[idx]
@@ -128,16 +135,14 @@ class Model:
         empirical_count = 0
         for i in range(len(self.train_sentences)):
             for j in range(len(self.train_sentences[i])):
-                empirical_count += sum([v[x] for x in self.feature_extractor(self.train_sentences[i], self.train_tags[i], j)])
-        expected_counts = 0
-        for i in range(len(self.train_sentences)):
-            for j in range(len(self.train_sentences[i])):
-                sum_over_tags = 0
-                for tag in self.set_of_tags:
-                    sum_over_tags += exp(sum([v[x] for x in self.feature_extractor(self.train_sentences[i], self.train_tags[i], j, tag)]))
-                expected_counts += log(sum_over_tags)
-        logger.info('v is now: {}'.format(v))
-        return -(empirical_count - expected_counts)# - ((LAMBDA/2) * np.dot(v, v)))
+                mahane = 0
+                for current_tag in self.set_of_tags:
+                    mahane += exp(sum([v[x] for x in self.feature_extractor(
+                        self.train_sentences[i], self.train_tags[i], j, current_tag)]))
+                empirical_count += self.calculate_log_probability(self.train_tags[i][j], self.train_sentences[i],
+                                                                  self.train_tags[i], j, v, mahane)
+        # logger.info('v is now: {}'.format(v))
+        return -(empirical_count - ((LAMBDA/2) * np.dot(v, v)))
 
     @timer
     def dLdv(self, v):
@@ -149,13 +154,17 @@ class Model:
                 for current_tag in self.set_of_tags:
                     mahane += exp(sum([v[x] for x in self.feature_extractor(
                         self.train_sentences[i], self.train_tags[i], j, current_tag)]))
+        for i in range(len(self.train_sentences)):
+            for j in range(len(self.train_sentences[i])):
                 for tag in self.set_of_tags:
                     features = self.feature_extractor(self.train_sentences[i], self.train_tags[i], j, tag)
                     prob = self.calculate_probability(tag, self.train_sentences[i], self.train_tags[i], j, v, mahane)
                     for idx in features:
                         expected_counts[idx] += prob
-        logger.info('v is now: {}'.format(v))
-        return -(self.sum_of_features - expected_counts) #- (LAMBDA*v))
+        # logger.info('v is now: {}'.format(v))
+        logger.critical("iteration number: {}".format(self.iteration_number))
+        self.iteration_number += 1
+        return -(self.sum_of_features - expected_counts - (LAMBDA*v))
 
     def feature_extractor(self, words, tags, idx, current_tag=None):
         # print('run feature extractor')
@@ -202,15 +211,17 @@ class Model:
         return new_ret
 
     def train(self):
-        print('start time: {}'.format(datetime.datetime.now()))
-        self.v = minimize(self.L, np.zeros(self.int), method='L-BFGS-B', jac=self.dLdv)
-        print('end time: {}'.format(datetime.datetime.now()))
-        self.v.dump('v.dat')
+        logger.debug('Start Now!!')
+        self.v = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
+        logger.debug('End Now!!')
+        logger.debug("v is: {}".format(self.v))
+        np.save('v', self.v[0])
+        np.savetxt('v.txt', self.v[0])
 
 
 if __name__ == '__main__':
     all_sentences = parse('train.wtag')
     mymodel = Model(all_sentences).train()
-    a=1
+
 
 
