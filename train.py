@@ -1,7 +1,6 @@
-from parser import parse
+import data_parser as prs
 from math import exp, log
 import numpy as np
-from collections import defaultdict
 import datetime
 import logging
 import functools
@@ -40,35 +39,44 @@ class Model:
         self.train_tags = []
         self.key_to_int = {}
         self.int = 0
+        tag_enum = 0
+        self.tag_to_int = {}
+        self.int_to_tag = {}
+        self.word_map = {}
         for sentence in train_data:
             words = [a[0] for a in sentence]
             self.train_sentences.append(words)
             tags = [a[1] for a in sentence]
             self.train_tags.append(tags)
             for tag in tags:
-                self.set_of_tags.add(tag)
+                if tag not in self.set_of_tags:
+                    self.set_of_tags.add(tag)
+                    self.tag_to_int[tag] = tag_enum
+                    self.int_to_tag[tag_enum] = tag
+                    tag_enum += 1
             for idx, _ in enumerate(sentence):
                 self.feature_collector(words, tags, idx)
-        sum_of_features = np.zeros(self.int)
+        self.data_features = []
+        self.data_alt_features = []
         self.v = None
-        for sentence in train_data:
-            words = [a[0] for a in sentence]
-            self.train_sentences.append(words)
-            tags = [a[1] for a in sentence]
-            self.train_tags.append(tags)
-            for tag in tags:
-                self.set_of_tags.add(tag)
-            for idx, _ in enumerate(sentence):
-                feature = self.feature_extractor(words, tags[idx], tags[idx - 1] if idx > 0 else '*',
-                                                 tags[idx - 2] if idx > 1 else '*', idx)
-                sum_of_features = sum_of_features + feature.toarray()
-        self.sum_of_features = sparse_mat(sum_of_features)
-        enumerator = 0
-        for tag in self.set_of_tags:
-            self.tag_to_idx[tag] = enumerator
-            enumerator += 1
-        self.tag_to_idx['*'] = enumerator
-        self.tag_to_idx['STOP'] = enumerator + 1
+        self.sum_of_features = np.zeros(self.int)
+        word_enum = 0
+        for i in range(len(self.train_sentences)):
+            for idx in range(len(self.train_sentences[i])):
+                self.word_map[(i, idx)] = word_enum
+                word_enum += 1
+                self.data_features.append(self.feature_extractor(self.train_sentences[i], self.train_tags[i][idx],
+                                                                self.train_tags[i][idx - 1] if idx > 0 else '*',
+                                                                self.train_tags[i][idx - 2] if idx > 1 else '*', idx))
+                self.sum_of_features += self.data_features[word_enum - 1]
+                word_alt_features = [None] * len(self.set_of_tags)
+                for tag_id, tag in self.int_to_tag.items():
+                    word_alt_features[tag_id] = self.feature_extractor(self.train_sentences[i], tag,
+                                                                       self.train_tags[i][idx - 1] if idx > 0 else '*',
+                                                                       self.train_tags[i][idx - 2] if idx > 1 else '*',
+                                                                       idx)
+                self.data_alt_features.append(sparse_mat(np.array(word_alt_features)))
+        self.data_features = sparse_mat(self.data_features)
 
     def calculate_probability(self, tag, words, tags, idx, v, mahane):
 
@@ -77,12 +85,9 @@ class Model:
         return mone / mahane
 
     def calculate_log_probability(self, tag, words, tags, idx, v, mahane):
-        try:
-            mone = sum(v.dot(self.feature_extractor(words, tag, tags[idx - 1] if idx > 0 else '*',
+        mone = sum(v.dot(self.feature_extractor(words, tag, tags[idx - 1] if idx > 0 else '*',
                                                              tags[idx - 2] if idx > 1 else '*', idx)))
-            return mone - log(mahane)
-        except:
-            logger.critical("mahane is negative: {}".format(mahane))
+        return mone - log(mahane)
 
     def feature_collector(self, words, tags, idx):
         current_tag = tags[idx]
@@ -142,58 +147,36 @@ class Model:
     def L(self, v):
         logger.info('run L(v)')
         v_s = sparse_mat(v)
-        empirical_count = 0
-        for i in range(len(self.train_sentences)):
-            for j in range(len(self.train_sentences[i])):
-                mahane = 0
-                for current_tag in self.set_of_tags:
-                    mahane += exp(v_s.dot(self.feature_extractor(
-                        self.train_sentences[i], current_tag, self.train_tags[i][j-1] if j > 0 else '*',
-                        self.train_tags[i][j-2] if j > 1 else '*', j)))
-                empirical_count += self.calculate_log_probability(self.train_tags[i][j], self.train_sentences[i],
-                                                                  self.train_tags[i], j, v_s, mahane)
-        # logger.info('v is now: {}'.format(v))
-        return -(empirical_count - ((LAMBDA / 2) * v_s.dot(v_s)))
+        tmp1 = np.sum(self.data_features.dot(v_s.transpose()).toarray())
+        tmp2 = np.sum([np.log(np.sum(np.exp(mat.dot(v_s.transpose()).toarray()))) for mat in self.data_alt_features])
+        return -(tmp1 - tmp2 - ((LAMBDA / 2) * v_s.dot(v_s.transpose())[0, 0]))
 
     @timer
     def dLdv(self, v):
         logger.info("run dldv")
         v_s = sparse_mat(v)
-        expected_counts = np.zeros(self.int)
-        for i in range(len(self.train_sentences)):
-            for j in range(len(self.train_sentences[i])):
-                mahane = 0
-                for current_tag in self.set_of_tags:
-                    mahane += exp(v_s.dot(self.feature_extractor(
-                        self.train_sentences[i], current_tag, self.train_tags[i][j-1] if j > 0 else '*',
-                        self.train_tags[i][j-2] if j > 1 else '*', j)))
-                for tag in self.set_of_tags:
-                    features = self.feature_extractor(
-                        self.train_sentences[i], tag, self.train_tags[i][j-1] if j > 0 else '*',
-                        self.train_tags[i][j-2] if j > 1 else '*', j)
-                    prob = self.calculate_probability(tag, self.train_sentences[i], self.train_tags[i], j, v_s, mahane)
-                    expected_counts = expected_counts + (features*prob)
-
-        # logger.info('v is now: {}'.format(v))
+        exp_count = np.sum([sparse_mat(np.exp(mat.dot(v_s.transpose()).toarray())
+                                              /np.sum(np.exp(mat.dot(
+            v_s.transpose()).toarray()))).transpose().dot(mat)
+                          for mat in self.data_alt_features]).transpose()
         logger.critical("iteration number: {}".format(self.iteration_number))
         self.iteration_number += 1
-        return -(self.sum_of_features - expected_counts - (LAMBDA * v_s))
+        return -np.subtract(np.subtract(self.sum_of_features, exp_count.toarray()[:,0]), (LAMBDA * v_s).transpose().toarray()[:,0])
 
     def feature_extractor(self, words, tag, last_t, last2_t, idx):
-        # print('run feature extractor')
         new_ret = np.zeros(self.int)
         key = '{}_{}'.format(words[idx], tag)
         for i in range(1, 5):
             if len(words[idx]) >= i:
                 key = 'suffix{}_{}_{}'.format(i, words[idx][-i:], tag)
                 if key in self.key_to_int:
-                    new_ret[0][self.key_to_int[key]] = 1
+                    new_ret[self.key_to_int[key]] = 1
 
         for i in range(1, 5):
             if len(words[idx]) >= i:
                 key = 'prefix{}_{}_{}'.format(i, words[idx][-i:], tag)
                 if key in self.key_to_int:
-                    new_ret[0][self.key_to_int[key]] = 1
+                    new_ret[self.key_to_int[key]] = 1
 
         if idx == 0:
             key = '{}_{}_{}'.format('*', '*', tag)
@@ -203,7 +186,7 @@ class Model:
             key = '{}_{}_{}'.format(last2_t, last_t, tag)
 
         if key in self.key_to_int:
-            new_ret[0][self.key_to_int[key]] = 1
+            new_ret[self.key_to_int[key]] = 1
 
         if idx == 0:
             key = '{}_{}'.format('*', tag)
@@ -211,30 +194,32 @@ class Model:
             key = '{}_{}'.format(last_t, tag)
 
         if key in self.key_to_int:
-            new_ret[0][self.key_to_int[key]] = 1
+            new_ret[self.key_to_int[key]] = 1
         if tag in self.key_to_int:
-            new_ret[0][self.key_to_int[tag]] = 1
+            new_ret[self.key_to_int[tag]] = 1
 
         if idx > 0:
             key = 'prev_{}_{}'.format(words[idx - 1], tag)
             if key in self.key_to_int:
-                new_ret[0][self.key_to_int[key]] = 1
+                new_ret[self.key_to_int[key]] = 1
 
         if idx < len(words) - 1:
             key = 'next_{}_{}'.format(words[idx + 1], tag)
             if key in self.key_to_int:
-                new_ret[0][self.key_to_int[key]] = 1
-        return sparse_mat(new_ret)
+                new_ret[self.key_to_int[key]] = 1
+        return new_ret
 
     def train(self):
         logger.debug('Start Now!!')
-        self.v = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)[0]
+        self.v, f, d = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
         logger.debug('End Now!!')
         logger.debug("v is: {}".format(self.v))
-        np.save('v', self.v[0])
-        np.savetxt('v.txt', self.v[0])
+        logger.debug("Result of minimize is {}".format(d['warnflag']))
+        logger.debug("Function called {} times".format(d['funcalls']))
+        logger.debug("Number of iterations {}".format(d['nit']))
+        np.save('v', self.v)
 
 
 if __name__ == '__main__':
-    all_sentences = parse('train.wtag')
+    all_sentences = prs.parse('train.wtag')
     mymodel = Model(all_sentences).train()
