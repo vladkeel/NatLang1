@@ -184,7 +184,7 @@ class Model:
                           for mat in self.data_alt_features]).transpose()
         logger.critical("iteration number: {}".format(self.iteration_number))
         self.iteration_number += 1
-        return -np.subtract(np.subtract(self.sum_of_features, exp_count.toarray()[:,0]), (LAMBDA * v_s).transpose().toarray()[:,0])
+        return -np.subtract(np.subtract(self.sum_of_features.toarray(), exp_count.toarray()[:,0]), (LAMBDA * v_s).transpose().toarray()[:,0])
 
     def feature_extractor(self, words, tag, last_t, last2_t, idx):
         new_ret = np.zeros(self.int)
@@ -237,7 +237,7 @@ class Model:
         self.v, f, d = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
         logger.debug('End Now!!')
         logger.debug("v is: {}".format(self.v))
-        logger.debug("Result of minimize is {}".format(d['warnflag']))
+        logger.debug("Result of minimize is {}".format("success" if d['warnflag'] == 0 else "failure"))
         logger.debug("Function called {} times".format(d['funcalls']))
         logger.debug("Number of iterations {}".format(d['nit']))
         np.save('v', self.v)
@@ -276,5 +276,6 @@ class Model:
 
 
 if __name__ == '__main__':
+    x = np.load('v.npy')
     all_sentences = prs.parse('train.wtag')
     mymodel = Model(all_sentences).train()
