@@ -314,13 +314,11 @@ class Model:
                             self.feature_extractor(sentence, is_cap, is_num, v, u, self.int_to_tag[i], k-1)).transpose()],
                                format='csr').transpose()
                     mahane = sum(np.exp(feature_tag_mat.dot(sparse_mat(self.v).transpose()).toarray()))
-                    calc = {}
-                    for idx in range(len(self.set_of_tags)):
-                        mone = np.exp(sparse_mat(self.v).dot(feature_tag_mat[idx, :].transpose())[0, 0])
-                        prob = mone/mahane
-                        calc[idx] = self.pi[k-1, idx, self.tag_to_int[u]] * prob
-                    self.pi[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc.values())
-                    self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc.items(), key=operator.itemgetter(1))[0]
+                    mone = np.exp(sparse_mat(self.v).dot(feature_tag_mat.transpose()).toarray())[0, :]
+                    prob = mone / mahane
+                    calc = [self.pi[k-1, idx, self.tag_to_int[u]] * prob[idx] for idx in range(len(self.set_of_tags))]
+                    self.pi[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc)
+                    self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = np.argmax(calc)
 
         tags = [None] * len(words)
         tags[len(tags)-1] = self.int_to_tag[np.argmax(self.pi[len(tags)])[1]]
