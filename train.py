@@ -300,6 +300,10 @@ class Model:
         self.pi = np.zeros((len(words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
         self.bp = np.zeros((len(words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
         self.pi[0, self.tag_to_int['*'], self.tag_to_int['*']] = 1
+        sentence = [words[i][0] for i in range(len(words))]
+        is_cap = [words[i][2] for i in range(len(words))]
+        is_num = [words[i][3] for i in range(len(words))]
+
         for k in range(1, len(words)+1):
             for u in self.tags_for_word(words, k-1):
                 for v in self.tags_for_word(words, k):
@@ -307,7 +311,7 @@ class Model:
                     feature_tag_mat = sparse_mat((0, self.int))
                     for i in range(len(self.set_of_tags)):
                         feature_tag_mat = hstack([feature_tag_mat.transpose(), sparse_mat(
-                            self.feature_extractor(words[0], words[2], words[3], v, u, self.int_to_tag[i], k-1)).transpose()],
+                            self.feature_extractor(sentence, is_cap, is_num, v, u, self.int_to_tag[i], k-1)).transpose()],
                                format='csr').transpose()
                     mahane = sum(np.exp(feature_tag_mat.dot(sparse_mat(self.v).transpose()).toarray()))
                     calc = {}
@@ -329,10 +333,11 @@ class Model:
 
 if __name__ == '__main__':
 
-    all_sentences = prs.parse('train.wtag')
-    mymodel = Model(all_sentences, True)
+    #all_sentences = prs.parse('train.wtag')
+    #mymodel = Model(all_sentences, True)
     # mymodel.train()
     test = prs.parse('test.wtag')
+    mymodel = Model([], True)
     with open('result_stats', 'w') as res_file:
         num_of_words = 0
         sum_good = 0
@@ -340,7 +345,7 @@ if __name__ == '__main__':
             num_of_words += len(sentence)
             words = [a[0] for a in sentence]
             tags = [a[1] for a in sentence]
-            tags_result = mymodel.infer(words)
+            tags_result = mymodel.infer(sentence)
             res = [1 if tags[i] == tags_result[i] else 0 for i in range(len(words))]
             sum_good += sum(res)
             res_file.write("sentence: {}".format(words))
