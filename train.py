@@ -304,9 +304,9 @@ class Model:
         is_cap = [words[i][2] for i in range(len(words))]
         is_num = [words[i][3] for i in range(len(words))]
 
-        for k in range(1, len(words)+1):
-            for u in self.tags_for_word(words, k-1):
-                for v in self.tags_for_word(words, k):
+        for k in range(1, len(sentence)+1):
+            for u in self.tags_for_word(sentence, k-1):
+                for v in self.tags_for_word(sentence, k):
                     logger.debug("building matrix for word {}, tag {}, last tag {}".format(k, v, u))
                     feature_tag_mat = sparse_mat((0, self.int))
                     for i in range(len(self.set_of_tags)):
@@ -320,10 +320,10 @@ class Model:
                     self.pi[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc)
                     self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = np.argmax(calc)
 
-        tags = [None] * len(words)
+        tags = [None] * len(sentence)
         tags[len(tags)-1] = self.int_to_tag[np.argmax(self.pi[len(tags)])[1]]
         tags[len(tags)-2] = self.int_to_tag[np.argmax(self.pi[len(tags)])[0]]
-        for k in range(len(words) - 3, -1, -1):
+        for k in range(len(sentence) - 3, -1, -1):
             tags[k] = self.int_to_tag[self.bp[k+3, self.tag_to_int[tags[k+1]], self.tag_to_int[tags[k+2]]]]
         return tags
 
