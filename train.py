@@ -321,8 +321,9 @@ class Model:
                     self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = np.argmax(calc)
 
         tags = [None] * len(sentence)
-        tags[len(tags)-1] = self.int_to_tag[np.argmax(self.pi[len(tags)])[1]]
-        tags[len(tags)-2] = self.int_to_tag[np.argmax(self.pi[len(tags)])[0]]
+        u, v = np.unravel_index(np.argmax(self.pi[len(sentence)]), self.pi[len(sentence)].shape)
+        tags[len(tags)-1] = self.int_to_tag[v]
+        tags[len(tags)-2] = self.int_to_tag[u]
         for k in range(len(sentence) - 3, -1, -1):
             tags[k] = self.int_to_tag[self.bp[k+3, self.tag_to_int[tags[k+1]], self.tag_to_int[tags[k+2]]]]
         return tags
