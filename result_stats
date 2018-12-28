@@ -1,1 +1,0 @@
-sentence: ['about', '400,000', 'commuters', 'trying', 'to']    real tags: ['IN', 'CD', 'NNS', 'VBG', 'TO']    infr tags: ['IN', 'CD', 'NN', 'VBG', 'TO']    Percision: 0.8
