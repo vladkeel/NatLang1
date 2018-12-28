@@ -17,7 +17,7 @@ coloredlogs.install(level='DEBUG')
 coloredlogs.install(level='DEBUG', logger=logger)
 LAMBDA = 3
 iteration_number = 1
-
+known_tags = {',', '.', ':', "''", ';', '``'}
 def progress_bar(progress, text):
     """
     Prints progress bar to console
@@ -81,10 +81,11 @@ class Model:
         self.bp = None
         logger.info("Collecting features and tags")
         for sentence in train_data:
-            words = [a[0] for a in sentence]
-            tags = [a[1] for a in sentence]
-            is_cap = [a[2] for a in sentence]
-            is_num = [a[3] for a in sentence]
+            filter_sentence = [x for x in sentence if x[0] not in known_tags]
+            words = [a[0] for a in filter_sentence]
+            tags = [a[1] for a in filter_sentence]
+            is_cap = [a[2] for a in filter_sentence]
+            is_num = [a[3] for a in filter_sentence]
             self.train_sentences.append(words)
             self.train_tags.append(tags)
             self.train_is_cap.append(is_cap)
@@ -95,17 +96,12 @@ class Model:
                     self.tag_to_int[tag] = tag_enum
                     self.int_to_tag[tag_enum] = tag
                     tag_enum += 1
-            for idx, _ in enumerate(sentence):
+            for idx, _ in enumerate(filter_sentence):
                 if words[idx] not in self.word_tag_dict:
-                    self.word_tag_dict[words[idx]] = set([tags[idx]])
+                    self.word_tag_dict[words[idx]] = {tags[idx]}
                 else:
                     self.word_tag_dict[words[idx]].add(tags[idx])
                 self.feature_collector(words, tags, idx)
-        if '*' not in self.set_of_tags:
-            self.set_of_tags.add('*')
-            self.tag_to_int['*'] = tag_enum
-            self.int_to_tag[tag_enum] = '*'
-            tag_enum += 1
 
         with open('set_of_tags', 'wb') as f:
             pickle.dump(self.set_of_tags, f)
@@ -245,13 +241,7 @@ class Model:
                 if key in self.key_to_int:
                     new_ret[self.key_to_int[key]] = 1
 
-        if idx == 0:
-            key = '{}_{}_{}'.format('*', '*', tag)
-        elif idx == 1:
-            key = '{}_{}_{}'.format('*', last_t, tag)
-        else:
-            key = '{}_{}_{}'.format(last2_t, last_t, tag)
-
+        key = '{}_{}_{}'.format(last2_t, last_t, tag)
         if key in self.key_to_int:
             new_ret[self.key_to_int[key]] = 1
 
@@ -295,30 +285,39 @@ class Model:
             else:
                 return self.set_of_tags
 
-    def infer(self, words):
+    def infer(self, all_words):
         logger.debug('Infering for given sentence')
-        self.pi = np.zeros((len(words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
-        self.bp = np.zeros((len(words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
+        filter_words = [x for x in all_words if x[0] not in known_tags]
+        ret_tags = [None]*len(all_words)
+        for i in range(len(all_words)):
+            if all_words[i][0] in known_tags:
+                ret_tags[i] = all_words[i][0]
+        self.pi = np.zeros((len(filter_words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
+        self.bp = np.zeros((len(filter_words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
         self.pi[0, self.tag_to_int['*'], self.tag_to_int['*']] = 1
-        sentence = [words[i][0] for i in range(len(words))]
-        is_cap = [words[i][2] for i in range(len(words))]
-        is_num = [words[i][3] for i in range(len(words))]
-
+        sentence = [filter_words[i][0] for i in range(len(filter_words))]
+        is_cap = [filter_words[i][2] for i in range(len(filter_words))]
+        is_num = [filter_words[i][3] for i in range(len(filter_words))]
+        v_s = sparse_mat(self.v)
         for k in range(1, len(sentence)+1):
             for u in self.tags_for_word(sentence, k-1):
                 for v in self.tags_for_word(sentence, k):
                     logger.debug("building matrix for word {}, tag {}, last tag {}".format(k, v, u))
                     feature_tag_mat = sparse_mat((0, self.int))
-                    for i in range(len(self.set_of_tags)):
+                    enum_t = 0
+                    t_tags = {}
+                    for t in self.tags_for_word(sentence, k-2):
+                        t_tags[enum_t] = t
+                        enum_t += 1
                         feature_tag_mat = hstack([feature_tag_mat.transpose(), sparse_mat(
-                            self.feature_extractor(sentence, is_cap, is_num, v, u, self.int_to_tag[i], k-1)).transpose()],
+                            self.feature_extractor(sentence, is_cap, is_num, v, u, t, k-1)).transpose()],
                                format='csr').transpose()
-                    mahane = sum(np.exp(feature_tag_mat.dot(sparse_mat(self.v).transpose()).toarray()))
-                    mone = np.exp(sparse_mat(self.v).dot(feature_tag_mat.transpose()).toarray())[0, :]
+                    mone = np.exp(v_s.dot(feature_tag_mat.transpose()).toarray())[0, :]
+                    mahane = sum(mone)
                     prob = mone / mahane
                     calc = [self.pi[k-1, idx, self.tag_to_int[u]] * prob[idx] for idx in range(len(self.set_of_tags))]
                     self.pi[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc)
-                    self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = np.argmax(calc)
+                    self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = self.tag_to_int[t_tags[np.argmax(calc)]]
 
         tags = [None] * len(sentence)
         u, v = np.unravel_index(np.argmax(self.pi[len(sentence)]), self.pi[len(sentence)].shape)
@@ -326,17 +325,22 @@ class Model:
         tags[len(tags)-2] = self.int_to_tag[u]
         for k in range(len(sentence) - 3, -1, -1):
             tags[k] = self.int_to_tag[self.bp[k+3, self.tag_to_int[tags[k+1]], self.tag_to_int[tags[k+2]]]]
-        return tags
+        i = 0
+        for tag in tags:
+            while ret_tags[i] is not None:
+                i += 1
+            ret_tags[i] = tag
+        return ret_tags
 
 
 
 if __name__ == '__main__':
 
-    #all_sentences = prs.parse('train.wtag')
-    #mymodel = Model(all_sentences, True)
-    # mymodel.train()
+    all_sentences = prs.parse('train.wtag')
+    mymodel = Model(all_sentences)
+    mymodel.train()
     test = prs.parse('test.wtag')
-    mymodel = Model([], True)
+    #mymodel = Model([], True)
     with open('result_stats', 'w') as res_file:
         num_of_words = 0
         sum_good = 0
