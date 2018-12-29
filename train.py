@@ -1,5 +1,4 @@
 import data_parser as prs
-from math import exp, log
 import numpy as np
 import datetime
 import logging
@@ -11,13 +10,13 @@ from scipy.sparse import csr_matrix as sparse_mat
 from scipy.sparse import hstack
 import sys
 import pickle
-import operator
 logger = logging.getLogger()
 coloredlogs.install(level='DEBUG')
 coloredlogs.install(level='DEBUG', logger=logger)
-LAMBDA = 3
+LAMBDA = 10
 iteration_number = 1
-known_tags = {',', '.', ':', "''", ';', '``', '#', '$'}
+known_tags = {',':',', '.':'.', ':':':', "''":"''", ';':':', '``':'``', '#':'#', '$':'$', '--':':', '...':':',
+              '-RCB-':'-RRB-', '-RRB-':'-RRB-', '-LCB-':'-LRB-', '-LRB-':'-LRB-', '?':'.', '!':'.', 'US$':'$'}
 def progress_bar(progress, text):
     """
     Prints progress bar to console
@@ -107,22 +106,12 @@ class Model:
                 self.feature_collector(self.train_sentences[i], self.train_tags[i], self.train_tags[i][idx], idx)
             progress_bar(i / len(self.train_sentences),
                          "completed {} of {} sentences".format(i, len(self.train_sentences)))
-        set_of_useful_features = [k for k, v in self.set_of_features.items() if float(v) >= 10]
+        set_of_useful_features = [k for k, v in self.set_of_features.items() if float(v) >= 5]
         self.int = 0
         for key in set_of_useful_features:
             self.key_to_int[key] = self.int
             self.int += 1
 
-        with open('set_of_tags', 'wb') as f:
-            pickle.dump(self.set_of_tags, f)
-        with open('tag_to_int', 'wb') as f:
-            pickle.dump(self.tag_to_int, f)
-        with open('int_to_tag', 'wb') as f:
-            pickle.dump(self.int_to_tag, f)
-        with open('key_to_int', 'wb') as f:
-            pickle.dump(self.key_to_int, f)
-        with open('word_tag_dict', 'wb') as f:
-            pickle.dump(self.word_tag_dict, f)
         logger.info("Collected {} features and {} tags".format(self.int, tag_enum))
         self.data_features = sparse_mat((0, self.int))
         self.data_alt_features = []
@@ -304,6 +293,21 @@ class Model:
                 new_ret[self.key_to_int[key]] = 1
         return new_ret
 
+    def finish_train(self):
+        tag_idx = len(self.set_of_tags)
+        self.int_to_tag[tag_idx] = '*'
+        self.tag_to_int['*'] = tag_idx
+        with open('set_of_tags', 'wb') as f:
+            pickle.dump(self.set_of_tags, f)
+        with open('tag_to_int', 'wb') as f:
+            pickle.dump(self.tag_to_int, f)
+        with open('int_to_tag', 'wb') as f:
+            pickle.dump(self.int_to_tag, f)
+        with open('key_to_int', 'wb') as f:
+            pickle.dump(self.key_to_int, f)
+        with open('word_tag_dict', 'wb') as f:
+            pickle.dump(self.word_tag_dict, f)
+        np.save('v', self.v)
     def train(self):
         logger.debug('Start Now!!')
         self.v, f, d = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
@@ -312,7 +316,7 @@ class Model:
         logger.debug("Result of minimize is {}".format("success" if d['warnflag'] == 0 else "failure"))
         logger.debug("Function called {} times".format(d['funcalls']))
         logger.debug("Number of iterations {}".format(d['nit']))
-        np.save('v', self.v)
+        self.finish_train()
 
     def tags_for_word(self, words, idx):
         if idx <= 0:
@@ -329,9 +333,9 @@ class Model:
         ret_tags = [None]*len(all_words)
         for i in range(len(all_words)):
             if all_words[i][0] in known_tags:
-                ret_tags[i] = all_words[i][0]
-        self.pi = np.zeros((len(filter_words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
-        self.bp = np.zeros((len(filter_words) + 1, len(self.set_of_tags), len(self.set_of_tags)))
+                ret_tags[i] = known_tags[all_words[i][0]]
+        self.pi = np.zeros((len(filter_words) + 1, len(self.tag_to_int), len(self.tag_to_int)))
+        self.bp = np.zeros((len(filter_words) + 1, len(self.tag_to_int), len(self.tag_to_int)))
         self.pi[0, self.tag_to_int['*'], self.tag_to_int['*']] = 1
         sentence = [filter_words[i][0] for i in range(len(filter_words))]
         is_cap = [filter_words[i][2] for i in range(len(filter_words))]
@@ -344,10 +348,10 @@ class Model:
                     feature_tag_mat, t_tags = self.feature_extractor_for_tags(sentence, is_cap, is_num,
                                                                               self.tags_for_word(sentence, k-2),
                                                                               v, u, k-1)
-                    mone = np.exp(v_s.dot(feature_tag_mat.transpose()).toarray())[0, :]
+                    mone = np.exp(v_s.dot(feature_tag_mat).toarray())[0, :]
                     mahane = sum(mone)
                     prob = mone / mahane
-                    calc = [self.pi[k-1, idx, self.tag_to_int[u]] * prob[idx] for idx in range(len(self.set_of_tags))]
+                    calc = [self.pi[k-1, self.tag_to_int[t], self.tag_to_int[u]] * prob[idx] for idx, t in t_tags.items()]
                     self.pi[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc)
                     self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = self.tag_to_int[t_tags[np.argmax(calc)]]
 
@@ -376,7 +380,7 @@ if __name__ == '__main__':
     with open('result_stats', 'w') as res_file:
         num_of_words = 0
         sum_good = 0
-        for sentence in test[:10]:
+        for sentence in test:
             num_of_words += len(sentence)
             words = [a[0] for a in sentence]
             tags = [a[1] for a in sentence]
