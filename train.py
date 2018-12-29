@@ -81,7 +81,7 @@ class Model:
         self.bp = None
         logger.info("Collecting features and tags")
         for sentence in train_data:
-            filter_sentence = [x for x in sentence if x[1] not in known_tags]
+            filter_sentence = [x for x in sentence if x[0] not in known_tags]
             words = [a[0] for a in filter_sentence]
             tags = [a[1] for a in filter_sentence]
             is_cap = [a[2] for a in filter_sentence]
