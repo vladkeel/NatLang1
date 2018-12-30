@@ -308,6 +308,7 @@ class Model:
         with open('word_tag_dict', 'wb') as f:
             pickle.dump(self.word_tag_dict, f)
         np.save('v', self.v)
+
     def train(self):
         logger.debug('Start Now!!')
         self.v, f, d = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
@@ -328,7 +329,7 @@ class Model:
                 return self.set_of_tags
 
     def infer(self, all_words):
-        logger.debug('Infering for given sentence')
+        # logger.debug('Infering for given sentence')
         filter_words = [x for x in all_words if x[0] not in known_tags]
         ret_tags = [None]*len(all_words)
         for i in range(len(all_words)):
@@ -371,25 +372,22 @@ class Model:
 
 if __name__ == '__main__':
 
-    all_sentences = prs.parse('train.wtag')
-    mymodel = Model(all_sentences)
-    mymodel.train()
+    # all_sentences = prs.parse('train.wtag')
+    # mymodel = Model(all_sentences)
+    # mymodel.train()
     test = prs.parse('test.wtag')
-    #mymodel = Model([], True)
+    mymodel = Model([], True)
     with open('result_stats', 'w') as res_file:
         num_of_words = 0
         sum_good = 0
-        test_len = len(test)
-        i = 0
-        for sentence in test:
+        for i, sentence in enumerate(test, start=1):
             num_of_words += len(sentence)
             words = [a[0] for a in sentence]
             tags = [a[1] for a in sentence]
             tags_result = mymodel.infer(sentence)
-            i += 1
-            progress_bar(i/test_len, " Inferring for sentences")
             res = [1 if tags[i] == tags_result[i] else 0 for i in range(len(words))]
             sum_good += sum(res)
+            progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
             res_file.write("sentence: {}".format(words))
             res_file.write("    real tags: {}".format(tags))
             res_file.write("    infr tags: {}".format(tags_result))
