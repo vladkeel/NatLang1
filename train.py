@@ -15,8 +15,8 @@ coloredlogs.install(level='DEBUG')
 coloredlogs.install(level='DEBUG', logger=logger)
 LAMBDA = 10
 iteration_number = 1
-known_tags = {',':',', '.':'.', ':':':', "''":"''", ';':':', '``':'``', '#':'#', '$':'$', '--':':', '...':':',
-              '-RCB-':'-RRB-', '-RRB-':'-RRB-', '-LCB-':'-LRB-', '-LRB-':'-LRB-', '?':'.', '!':'.', 'US$':'$'}
+known_tags = {',':',', '.':'.', ':':':', "''":"''", ';':':', '``':'``', '#':'#', '--':':', '...':':', '-':':', "'":"''", '`':'``',
+        '-rcb-':'-RRB-', '-rrb-':'-RRB-', '-lcb-':'-LRB-', '-lrb-':'-LRB-', '?':'.', '!':'.'}
 def progress_bar(progress, text):
     """
     Prints progress bar to console
