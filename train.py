@@ -344,7 +344,6 @@ class Model:
         for k in range(1, len(sentence)+1):
             for u in self.tags_for_word(sentence, k-1):
                 for v in self.tags_for_word(sentence, k):
-                    logger.debug("building matrix for word {}, tag {}, last tag {}".format(k, v, u))
                     feature_tag_mat, t_tags = self.feature_extractor_for_tags(sentence, is_cap, is_num,
                                                                               self.tags_for_word(sentence, k-2),
                                                                               v, u, k-1)
@@ -380,11 +379,15 @@ if __name__ == '__main__':
     with open('result_stats', 'w') as res_file:
         num_of_words = 0
         sum_good = 0
+        test_len = len(test)
+        i = 0
         for sentence in test:
             num_of_words += len(sentence)
             words = [a[0] for a in sentence]
             tags = [a[1] for a in sentence]
             tags_result = mymodel.infer(sentence)
+            i += 1
+            progress_bar(i/test_len, " Inferring for sentences")
             res = [1 if tags[i] == tags_result[i] else 0 for i in range(len(words))]
             sum_good += sum(res)
             res_file.write("sentence: {}".format(words))
