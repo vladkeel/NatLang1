@@ -237,15 +237,19 @@ class Model:
                                                                last_t, last2_t, idx)
         return sparse_mat(word_alt_features)
 
+    def feature_extractor_all_tags2(self, words, is_cap, is_num, last_t, last2_t, idx):
+        word_alt_features = [None] * len(self.set_of_tags)
+        for tag_id, tag in self.int_to_tag.items():
+            word_alt_features[tag_id] = self.feature_extractor_aux(words, is_cap,
+                                                               is_num,
+                                                               last_t, last2_t, tag, idx)
+        return sparse_mat(word_alt_features)
+
     def feature_extractor_for_tags(self, words, is_cap, is_num, tags, last_t, last2_t, idx):
-        enum_t = 0
-        t_tags = {}
         mat = []
         for t in tags:
-            t_tags[enum_t] = t
-            enum_t += 1
             mat.append(self.feature_extractor_aux(words, is_cap, is_num, last_t, last2_t, t, idx))
-        return sparse_mat(mat).transpose(), t_tags
+        return sparse_mat(mat).transpose()
 
     def feature_extractor_aux(self, words, is_cap, is_num, tag, last_t, last2_t, idx):
         new_ret = np.zeros(self.int)
@@ -343,17 +347,22 @@ class Model:
         is_num = [filter_words[i][3] for i in range(len(filter_words))]
         v_s = sparse_mat(self.v)
         for k in range(1, len(sentence)+1):
-            for u in self.tags_for_word(sentence, k-1):
-                for v in self.tags_for_word(sentence, k):
-                    feature_tag_mat, t_tags = self.feature_extractor_for_tags(sentence, is_cap, is_num,
-                                                                              self.tags_for_word(sentence, k-2),
-                                                                              v, u, k-1)
-                    mone = np.exp(v_s.dot(feature_tag_mat).toarray())[0, :]
-                    mahane = sum(mone)
+            V = {x: i for i, x in enumerate(self.tags_for_word(sentence, k))}
+            U = {x: i for i, x in enumerate(self.tags_for_word(sentence, k-1))}
+            T = {x: i for i, x in enumerate(self.tags_for_word(sentence, k-2))}
+            for u in U.keys():
+                feature_tag_mat_per_v = [self.feature_extractor_for_tags(sentence, is_cap, is_num,
+                                                                         T.keys(), v, u, k - 1) for v in V.keys()]
+                mahane = [np.sum(np.exp(v_s.dot(sparse_mat([feature_tag_mat_per_v[v][:,
+                                                                T[t]].transpose().toarray()[0, :] for v in V.values()])
+                                                    .transpose()).toarray()[0, :])) for t in T.keys()]
+                for v in V.keys():
+                    mone = np.exp(v_s.dot((feature_tag_mat_per_v[V[v]])).toarray())[0, :]
                     prob = mone / mahane
-                    calc = [self.pi[k-1, self.tag_to_int[t], self.tag_to_int[u]] * prob[idx] for idx, t in t_tags.items()]
+                    calc = [self.pi[k-1, self.tag_to_int[t], self.tag_to_int[u]] * prob[idx] for t, idx in T.items()]
                     self.pi[k, self.tag_to_int[u], self.tag_to_int[v]] = max(calc)
-                    self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = self.tag_to_int[t_tags[np.argmax(calc)]]
+                    tmp = list(T.keys())[list(T.values()).index(np.argmax(calc))]
+                    self.bp[k, self.tag_to_int[u], self.tag_to_int[v]] = self.tag_to_int[tmp]
 
         tags = [None] * len(sentence)
         u, v = np.unravel_index(np.argmax(self.pi[len(sentence)]), self.pi[len(sentence)].shape)
@@ -370,11 +379,14 @@ class Model:
 
 
 
+
+
 if __name__ == '__main__':
 
     # all_sentences = prs.parse('train.wtag')
     # mymodel = Model(all_sentences)
     # mymodel.train()
+    logger.debug("Hashtag Ithalnu")
     test = prs.parse('test.wtag')
     mymodel = Model([], True)
     with open('result_stats', 'w') as res_file:
@@ -385,7 +397,7 @@ if __name__ == '__main__':
             words = [a[0] for a in sentence]
             tags = [a[1] for a in sentence]
             tags_result = mymodel.infer(sentence)
-            res = [1 if tags[i] == tags_result[i] else 0 for i in range(len(words))]
+            res = [1 if tags[j] == tags_result[j] else 0 for j in range(len(words))]
             sum_good += sum(res)
             progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
             res_file.write("sentence: {}".format(words))
