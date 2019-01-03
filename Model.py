@@ -10,6 +10,8 @@ from scipy.sparse import csr_matrix as sparse_mat
 from scipy.sparse import hstack
 import sys
 import pickle
+import os
+logging.basicConfig(filename='logger.txt', level=logging.DEBUG)
 logger = logging.getLogger()
 coloredlogs.install(level='DEBUG')
 coloredlogs.install(level='DEBUG', logger=logger)
@@ -48,18 +50,19 @@ def timer(func):
 
 
 class Model:
-    def __init__(self, train_data, is_test=False):
+    def __init__(self, dir, is_test=False):
+        self.dir = dir
         if is_test:
-            self.v = np.load('v.npy')
-            with open('int_to_tag', 'rb') as f:
+            self.v = np.load(os.path.join(self.dir, 'v.npy'))
+            with open(os.path.join(dir, 'int_to_tag'), 'rb') as f:
                 self.int_to_tag = pickle.load(f)
-            with open('set_of_tags', 'rb') as f:
+            with open(os.path.join(dir, 'set_of_tags'), 'rb') as f:
                 self.set_of_tags = pickle.load(f)
-            with open('tag_to_int', 'rb') as f:
+            with open(os.path.join(dir, 'tag_to_int'), 'rb') as f:
                 self.tag_to_int = pickle.load(f)
-            with open('key_to_int', 'rb') as f:
+            with open(os.path.join(dir, 'key_to_int'), 'rb') as f:
                 self.key_to_int = pickle.load(f)
-            with open('word_tag_dict', 'rb') as f:
+            with open(os.path.join(dir, 'word_tag_dict'), 'rb') as f:
                 self.word_tag_dict = pickle.load(f)
             self.int = len(self.key_to_int)
             return
@@ -73,13 +76,93 @@ class Model:
         self.train_is_cap = []
         self.train_is_num = []
         self.key_to_int = {}
+        self.data_alt_features = []
+        self.data_features = None
+        self.sum_of_features = None
         self.int = 0
-        tag_enum = 0
         self.tag_to_int = {}
         self.int_to_tag = {}
         self.pi = None
         self.bp = None
+        self.v = None
+
+    def clear(self):
+        self.word_tag_dict = {}
+        self.iteration_number = 1
+        self.set_of_tags = set()
+        self.set_of_features = {}
+        self.train_sentences = []
+        self.train_tags = []
+        self.train_is_cap = []
+        self.train_is_num = []
+        self.key_to_int = {}
+        self.data_alt_features = []
+        self.data_features = None
+        self.sum_of_features = None
+        self.int = 0
+        self.tag_to_int = {}
+        self.int_to_tag = {}
+        self.pi = None
+        self.bp = None
+        self.v = None
+
+    def feature_collector(self, words, tags, current_tag, idx):
+        pass
+
+    @timer
+    def L(self, v):
+        logger.info('run L(v)')
+        v_s = sparse_mat(v)
+        tmp1 = np.sum(self.data_features.dot(v_s.transpose()).toarray())
+        tmp2 = np.sum([np.log(np.sum(np.exp(mat.dot(v_s.transpose()).toarray()))) for mat in self.data_alt_features])
+        return -(tmp1 - tmp2 - ((LAMBDA / 2) * v_s.dot(v_s.transpose())[0, 0]))
+
+    @timer
+    def dLdv(self, v):
+        logger.info("run dldv")
+        v_s = sparse_mat(v)
+        exp_count = np.sum([sparse_mat(np.exp(mat.dot(v_s.transpose()).toarray())
+                                              /np.sum(np.exp(mat.dot(
+            v_s.transpose()).toarray()))).transpose().dot(mat)
+                          for mat in self.data_alt_features]).transpose()
+        logger.critical("iteration number: {}".format(self.iteration_number))
+        self.iteration_number += 1
+        return -np.subtract(np.subtract(self.sum_of_features.toarray(), exp_count.toarray()[:,0]), (LAMBDA * v_s).transpose().toarray()[:,0])
+
+    def feature_extractor(self, words, is_cap, is_num, tag, last_t, last2_t, idx):
+        pass
+
+    def feature_extractor_all_tags(self, words, is_cap, is_num, last_t, last2_t, idx):
+        pass
+
+    def feature_extractor_all_tags2(self, words, is_cap, is_num, last_t, last2_t, idx):
+        pass
+
+    def feature_extractor_for_tags(self, words, is_cap, is_num, tags, last_t, last2_t, idx):
+        pass
+
+    def feature_extractor_aux(self, words, is_cap, is_num, tag, last_t, last2_t, idx):
+        pass
+
+    def finish_train(self):
+        tag_idx = len(self.set_of_tags)
+        self.int_to_tag[tag_idx] = '*'
+        self.tag_to_int['*'] = tag_idx
+        with open(os.path.join(self.dir, 'set_of_tags'), 'wb') as f:
+            pickle.dump(self.set_of_tags, f)
+        with open(os.path.join(self.dir, 'tag_to_int'), 'wb') as f:
+            pickle.dump(self.tag_to_int, f)
+        with open(os.path.join(self.dir, 'int_to_tag'), 'wb') as f:
+            pickle.dump(self.int_to_tag, f)
+        with open(os.path.join(self.dir, 'key_to_int'), 'wb') as f:
+            pickle.dump(self.key_to_int, f)
+        with open(os.path.join(self.dir, 'word_tag_dict'), 'wb') as f:
+            pickle.dump(self.word_tag_dict, f)
+        np.save(os.path.join(self.dir, 'v'), self.v)
+
+    def train(self, train_data):
         logger.info("Collecting features and tags")
+        tag_enum = 0
         for sentence in train_data:
             filter_sentence = [x for x in sentence if x[0] not in known_tags]
             words = [a[0] for a in filter_sentence]
@@ -115,7 +198,6 @@ class Model:
         logger.info("Collected {} features and {} tags".format(self.int, tag_enum))
         self.data_features = sparse_mat((0, self.int))
         self.data_alt_features = []
-        self.v = None
         self.sum_of_features = sparse_mat((1, self.int))
         logger.info("Extracting features")
         for i in range(len(self.train_sentences)):
@@ -134,186 +216,6 @@ class Model:
                                                                               idx))
             progress_bar(i/len(self.train_sentences), "completed {} of {} sentences".format(i, len(self.train_sentences)))
         logger.info("Extracted features for all words")
-
-    def feature_collector(self, words, tags, current_tag, idx):
-        key = 'includes_numeral_{}'.format(current_tag)
-        if key not in self.set_of_features:
-            self.set_of_features[key] = 1
-        else:
-            self.set_of_features[key] += 1
-        key = 'capitalized_{}'.format(current_tag)
-        if key not in self.set_of_features:
-            self.set_of_features[key] = 1
-        else:
-            self.set_of_features[key] += 1
-        if current_tag not in self.set_of_features:
-            self.set_of_features[current_tag] = 1
-        else:
-            self.set_of_features[current_tag] += 1
-        key = '{}_{}'.format(words[idx], current_tag)
-        if key not in self.set_of_features:
-            self.set_of_features[key] = 1
-        else:
-            self.set_of_features[key] += 1
-        for i in range(1, 5):
-            if len(words[idx]) >= i:
-                key = 'suffix{}_{}_{}'.format(i, words[idx][-i:], current_tag)
-                if key not in self.set_of_features:
-                    self.set_of_features[key] = 1
-                else:
-                    self.set_of_features[key] += 1
-        for i in range(1, 5):
-            if len(words[idx]) >= i:
-                key = 'prefix{}_{}_{}'.format(i, words[idx][-i:], current_tag)
-                if key not in self.set_of_features:
-                    self.set_of_features[key] = 1
-                else:
-                    self.set_of_features[key] += 1
-
-        if idx == 0:
-            key = '{}_{}_{}'.format('*', '*', current_tag)
-        elif idx == 1:
-            key = '{}_{}_{}'.format('*', tags[idx - 1], current_tag)
-        else:
-            key = '{}_{}_{}'.format(tags[idx - 2], tags[idx - 1], current_tag)
-
-        if key not in self.set_of_features:
-            self.set_of_features[key] = 1
-        else:
-            self.set_of_features[key] += 1
-
-        if idx == 0:
-            key = '{}_{}'.format('*', current_tag)
-        else:
-            key = '{}_{}'.format(tags[idx - 1], current_tag)
-
-        if key not in self.set_of_features:
-            self.set_of_features[key] = 1
-        else:
-            self.set_of_features[key] += 1
-
-        if idx > 0:
-            key = 'prev_{}_{}'.format(words[idx - 1], current_tag)
-            if key not in self.set_of_features:
-                self.set_of_features[key] = 1
-            else:
-                self.set_of_features[key] += 1
-
-        if idx < len(words) - 1:
-            key = 'next_{}_{}'.format(words[idx + 1], current_tag)
-            if key not in self.set_of_features:
-                self.set_of_features[key] = 1
-            else:
-                self.set_of_features[key] += 1
-
-    @timer
-    def L(self, v):
-        logger.info('run L(v)')
-        v_s = sparse_mat(v)
-        tmp1 = np.sum(self.data_features.dot(v_s.transpose()).toarray())
-        tmp2 = np.sum([np.log(np.sum(np.exp(mat.dot(v_s.transpose()).toarray()))) for mat in self.data_alt_features])
-        return -(tmp1 - tmp2 - ((LAMBDA / 2) * v_s.dot(v_s.transpose())[0, 0]))
-
-    @timer
-    def dLdv(self, v):
-        logger.info("run dldv")
-        v_s = sparse_mat(v)
-        exp_count = np.sum([sparse_mat(np.exp(mat.dot(v_s.transpose()).toarray())
-                                              /np.sum(np.exp(mat.dot(
-            v_s.transpose()).toarray()))).transpose().dot(mat)
-                          for mat in self.data_alt_features]).transpose()
-        logger.critical("iteration number: {}".format(self.iteration_number))
-        self.iteration_number += 1
-        return -np.subtract(np.subtract(self.sum_of_features.toarray(), exp_count.toarray()[:,0]), (LAMBDA * v_s).transpose().toarray()[:,0])
-
-    def feature_extractor(self, words, is_cap, is_num, tag, last_t, last2_t, idx):
-        return sparse_mat(self.feature_extractor_aux(words, is_cap, is_num, tag, last_t, last2_t, idx))
-
-    def feature_extractor_all_tags(self, words, is_cap, is_num, last_t, last2_t, idx):
-        word_alt_features = [None] * len(self.set_of_tags)
-        for tag_id, tag in self.int_to_tag.items():
-            word_alt_features[tag_id] = self.feature_extractor_aux(words, is_cap,
-                                                               is_num, tag,
-                                                               last_t, last2_t, idx)
-        return sparse_mat(word_alt_features)
-
-    def feature_extractor_all_tags2(self, words, is_cap, is_num, last_t, last2_t, idx):
-        word_alt_features = [None] * len(self.set_of_tags)
-        for tag_id, tag in self.int_to_tag.items():
-            word_alt_features[tag_id] = self.feature_extractor_aux(words, is_cap,
-                                                               is_num,
-                                                               last_t, last2_t, tag, idx)
-        return sparse_mat(word_alt_features)
-
-    def feature_extractor_for_tags(self, words, is_cap, is_num, tags, last_t, last2_t, idx):
-        mat = []
-        for t in tags:
-            mat.append(self.feature_extractor_aux(words, is_cap, is_num, last_t, last2_t, t, idx))
-        return sparse_mat(mat).transpose()
-
-    def feature_extractor_aux(self, words, is_cap, is_num, tag, last_t, last2_t, idx):
-        new_ret = np.zeros(self.int)
-        if is_cap[idx] and 'capitalized_{}'.format(tag) in self.key_to_int:
-            new_ret[self.key_to_int['capitalized_{}'.format(tag)]] = 1
-        if is_num[idx] and 'includes_numeral_{}'.format(tag) in self.key_to_int:
-            new_ret[self.key_to_int['includes_numeral_{}'.format(tag)]] = 1
-        key = '{}_{}'.format(words[idx], tag)
-        if key in self.key_to_int:
-            new_ret[self.key_to_int[key]] = 1
-        for i in range(1, 5):
-            if len(words[idx]) >= i:
-                key = 'suffix{}_{}_{}'.format(i, words[idx][-i:], tag)
-                if key in self.key_to_int:
-                    new_ret[self.key_to_int[key]] = 1
-
-        for i in range(1, 5):
-            if len(words[idx]) >= i:
-                key = 'prefix{}_{}_{}'.format(i, words[idx][-i:], tag)
-                if key in self.key_to_int:
-                    new_ret[self.key_to_int[key]] = 1
-
-        key = '{}_{}_{}'.format(last2_t, last_t, tag)
-        if key in self.key_to_int:
-            new_ret[self.key_to_int[key]] = 1
-
-        if idx == 0:
-            key = '{}_{}'.format('*', tag)
-        else:
-            key = '{}_{}'.format(last_t, tag)
-
-        if key in self.key_to_int:
-            new_ret[self.key_to_int[key]] = 1
-        if tag in self.key_to_int:
-            new_ret[self.key_to_int[tag]] = 1
-
-        if idx > 0:
-            key = 'prev_{}_{}'.format(words[idx - 1], tag)
-            if key in self.key_to_int:
-                new_ret[self.key_to_int[key]] = 1
-
-        if idx < len(words) - 1:
-            key = 'next_{}_{}'.format(words[idx + 1], tag)
-            if key in self.key_to_int:
-                new_ret[self.key_to_int[key]] = 1
-        return new_ret
-
-    def finish_train(self):
-        tag_idx = len(self.set_of_tags)
-        self.int_to_tag[tag_idx] = '*'
-        self.tag_to_int['*'] = tag_idx
-        with open('set_of_tags', 'wb') as f:
-            pickle.dump(self.set_of_tags, f)
-        with open('tag_to_int', 'wb') as f:
-            pickle.dump(self.tag_to_int, f)
-        with open('int_to_tag', 'wb') as f:
-            pickle.dump(self.int_to_tag, f)
-        with open('key_to_int', 'wb') as f:
-            pickle.dump(self.key_to_int, f)
-        with open('word_tag_dict', 'wb') as f:
-            pickle.dump(self.word_tag_dict, f)
-        np.save('v', self.v)
-
-    def train(self):
         logger.debug('Start Now!!')
         self.v, f, d = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
         logger.debug('End Now!!')
@@ -377,32 +279,15 @@ class Model:
             ret_tags[i] = tag
         return ret_tags
 
+    def test(self, train_file, test_file):
+        pass
 
+    def comp(self, comp_file):
+        test = prs.comp_pars(comp_file)
+        res_rows = []
+        for sentence in test:
+            words = [sentence[i][0] for i in range(len(sentence))]
+            tags = self.infer(sentence)
+            res_rows.append(prs.results_row(words, tags))
+        prs.write_results('res_{}'.format(comp_file), res_rows)
 
-
-
-if __name__ == '__main__':
-
-    # all_sentences = prs.parse('train.wtag')
-    # mymodel = Model(all_sentences)
-    # mymodel.train()
-    logger.debug("Hashtag Ithalnu")
-    test = prs.parse('test.wtag')
-    mymodel = Model([], True)
-    with open('result_stats', 'w') as res_file:
-        num_of_words = 0
-        sum_good = 0
-        for i, sentence in enumerate(test, start=1):
-            num_of_words += len(sentence)
-            words = [a[0] for a in sentence]
-            tags = [a[1] for a in sentence]
-            tags_result = mymodel.infer(sentence)
-            res = [1 if tags[j] == tags_result[j] else 0 for j in range(len(words))]
-            sum_good += sum(res)
-            progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
-            res_file.write("sentence: {}".format(words))
-            res_file.write("    real tags: {}".format(tags))
-            res_file.write("    infr tags: {}".format(tags_result))
-            res_file.write("    Percision: {}".format(sum(res) / len(words)))
-        res_file.write("----------------------------------------------------------------------------------------------")
-        res_file.write("Overall percision: {}".format(sum_good / num_of_words))
