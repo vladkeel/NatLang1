@@ -161,6 +161,8 @@ class ModelA(Model):
         sum_all = cnf_matrix.sum()
         result_accuracy = sum_good/sum_all
         print("Confusion matrix:", file=f)
+        title = ' '.join(self.int_to_tag[x] for x in range(len(self.set_of_tags)))
+        print(title, file=f)
         str_mat = '\n'.join(' '.join('%0.0f' %x for x in y) for y in cnf_matrix)
         print(str_mat, file=f)
         print("Accuracy: {}".format(result_accuracy), file=f)
