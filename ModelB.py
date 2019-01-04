@@ -144,7 +144,7 @@ class ModelB(Model):
                 new_ret[self.key_to_int[key]] = 1
         return new_ret
 
-    def test(self, train_file, test_file=None):
+    def test(self, train_file, test_file, f):
         test = prs.parse(train_file)
         test_size = len(test)
         fold_size = np.floor(test_size / 7)
@@ -154,7 +154,7 @@ class ModelB(Model):
             cv_train = test[:k*fold_size] + test[k*fold_size + fold_size:]
             self.clear()
             self.train(cv_train)
-            cnf_matrix = np.zeros(len(self.set_of_tags), len(self.set_of_tags))
+            cnf_matrix = np.zeros((len(self.set_of_tags), len(self.set_of_tags)))
             for i, sentence in enumerate(cv_test, start=1):
                 tags = [a[1] for a in sentence]
                 tags_result = self.infer(sentence)
@@ -163,6 +163,6 @@ class ModelB(Model):
                         cnf_matrix[self.tag_to_int[tags[j]]][self.tag_to_int[tags_result[j]]] += 1
                 progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
             sum_good = sum([cnf_matrix[i][i] for i in range(len(self.set_of_tags))])
-            sum_all = sum(cnf_matrix)
+            sum_all = cnf_matrix.sum()
             sum_acc += sum_good / sum_all
-        print("Accuracy: ".format(sum_acc / 7))
+        f.write("Accuracy: ".format(sum_acc / 7))

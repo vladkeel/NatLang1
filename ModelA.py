@@ -144,11 +144,11 @@ class ModelA(Model):
                 new_ret[self.key_to_int[key]] = 1
         return new_ret
 
-    def test(self, train_file, test_file):
+    def test(self, train_file, test_file,f):
         train_data = prs.parse(train_file)
         self.train(train_data)
         test = prs.parse(test_file)
-        cnf_matrix = np.zeros(len(self.set_of_tags), len(self.set_of_tags))
+        cnf_matrix = np.zeros((len(self.set_of_tags), len(self.set_of_tags)))
         for i, sentence in enumerate(test, start=1):
             tags = [a[1] for a in sentence]
             tags_result = self.infer(sentence)
@@ -157,8 +157,9 @@ class ModelA(Model):
                     cnf_matrix[self.tag_to_int[tags[j]]][self.tag_to_int[tags_result[j]]] += 1
             progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
         sum_good = sum([cnf_matrix[i][i] for i in range(len(self.set_of_tags))])
-        sum_all = sum(cnf_matrix)
+        sum_all = cnf_matrix.sum()
         result_accuracy = sum_good/sum_all
-        print("Confusion matrix:")
-        print(cnf_matrix)
-        print("Accuracy: {}".format(result_accuracy))
+        f.write("Confusion matrix:")
+        str_mat = '\n'.join('\t'.join('%0.0f' %x for x in y) for y in cnf_matrix)
+        f.write(str_mat)
+        f.write("Accuracy: {}".format(result_accuracy))

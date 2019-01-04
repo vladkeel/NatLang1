@@ -1,0 +1,513 @@
+INFO:root:Initializing model
+INFO:root:Collecting features and tags
+INFO:root:Collected 22589 features and 36 tags
+INFO:root:Extracting features
+INFO:root:Initializing model
+INFO:root:Collecting features and tags
+INFO:root:Collected 22589 features and 36 tags
+INFO:root:Extracting features
+INFO:root:Extracted features for all words
+DEBUG:root:Start Now!!
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:39.927799
+INFO:root:run dldv
+CRITICAL:root:iteration number: 1
+WARNING:root:Finished 'dLdv' in 0:03:21.395718
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:53.536109
+INFO:root:run dldv
+CRITICAL:root:iteration number: 2
+WARNING:root:Finished 'dLdv' in 0:03:36.388340
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.605628
+INFO:root:run dldv
+CRITICAL:root:iteration number: 3
+WARNING:root:Finished 'dLdv' in 0:03:35.191663
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:52.388236
+INFO:root:run dldv
+CRITICAL:root:iteration number: 4
+WARNING:root:Finished 'dLdv' in 0:03:34.150938
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.459498
+INFO:root:run dldv
+CRITICAL:root:iteration number: 5
+WARNING:root:Finished 'dLdv' in 0:03:33.440808
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.403255
+INFO:root:run dldv
+CRITICAL:root:iteration number: 6
+WARNING:root:Finished 'dLdv' in 0:03:30.315596
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.251551
+INFO:root:run dldv
+CRITICAL:root:iteration number: 7
+WARNING:root:Finished 'dLdv' in 0:03:31.539826
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.054236
+INFO:root:run dldv
+CRITICAL:root:iteration number: 8
+WARNING:root:Finished 'dLdv' in 0:03:31.935187
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.747430
+INFO:root:run dldv
+CRITICAL:root:iteration number: 9
+WARNING:root:Finished 'dLdv' in 0:03:30.906202
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.259383
+INFO:root:run dldv
+CRITICAL:root:iteration number: 10
+WARNING:root:Finished 'dLdv' in 0:03:30.395107
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.530951
+INFO:root:run dldv
+CRITICAL:root:iteration number: 11
+WARNING:root:Finished 'dLdv' in 0:03:29.918601
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.488332
+INFO:root:run dldv
+CRITICAL:root:iteration number: 12
+WARNING:root:Finished 'dLdv' in 0:03:28.733547
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.978617
+INFO:root:run dldv
+CRITICAL:root:iteration number: 13
+WARNING:root:Finished 'dLdv' in 0:03:29.866737
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.987971
+INFO:root:run dldv
+CRITICAL:root:iteration number: 14
+WARNING:root:Finished 'dLdv' in 0:03:31.594247
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.190404
+INFO:root:run dldv
+CRITICAL:root:iteration number: 15
+WARNING:root:Finished 'dLdv' in 0:03:31.107121
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.715187
+INFO:root:run dldv
+CRITICAL:root:iteration number: 16
+WARNING:root:Finished 'dLdv' in 0:03:33.013035
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.435209
+INFO:root:run dldv
+CRITICAL:root:iteration number: 17
+WARNING:root:Finished 'dLdv' in 0:03:32.759795
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.773691
+INFO:root:run dldv
+CRITICAL:root:iteration number: 18
+WARNING:root:Finished 'dLdv' in 0:03:30.909231
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.759087
+INFO:root:run dldv
+CRITICAL:root:iteration number: 19
+WARNING:root:Finished 'dLdv' in 0:03:30.828592
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:52.065253
+INFO:root:run dldv
+CRITICAL:root:iteration number: 20
+WARNING:root:Finished 'dLdv' in 0:03:31.698423
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.038790
+INFO:root:run dldv
+CRITICAL:root:iteration number: 21
+WARNING:root:Finished 'dLdv' in 0:03:28.856964
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.938005
+INFO:root:run dldv
+CRITICAL:root:iteration number: 22
+WARNING:root:Finished 'dLdv' in 0:03:30.359431
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.124883
+INFO:root:run dldv
+CRITICAL:root:iteration number: 23
+WARNING:root:Finished 'dLdv' in 0:03:29.199724
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.326274
+INFO:root:run dldv
+CRITICAL:root:iteration number: 24
+WARNING:root:Finished 'dLdv' in 0:03:29.629800
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.607977
+INFO:root:run dldv
+CRITICAL:root:iteration number: 25
+WARNING:root:Finished 'dLdv' in 0:03:30.290903
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.619460
+INFO:root:run dldv
+CRITICAL:root:iteration number: 26
+WARNING:root:Finished 'dLdv' in 0:03:29.616188
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.794247
+INFO:root:run dldv
+CRITICAL:root:iteration number: 27
+WARNING:root:Finished 'dLdv' in 0:03:29.179182
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.363389
+INFO:root:run dldv
+CRITICAL:root:iteration number: 28
+WARNING:root:Finished 'dLdv' in 0:03:29.485686
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.261605
+INFO:root:run dldv
+CRITICAL:root:iteration number: 29
+WARNING:root:Finished 'dLdv' in 0:03:29.819204
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.675172
+INFO:root:run dldv
+CRITICAL:root:iteration number: 30
+WARNING:root:Finished 'dLdv' in 0:03:29.771523
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.922389
+INFO:root:run dldv
+CRITICAL:root:iteration number: 31
+WARNING:root:Finished 'dLdv' in 0:03:30.492230
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.493131
+INFO:root:run dldv
+CRITICAL:root:iteration number: 32
+WARNING:root:Finished 'dLdv' in 0:03:29.416615
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.847300
+INFO:root:run dldv
+CRITICAL:root:iteration number: 33
+WARNING:root:Finished 'dLdv' in 0:03:30.567933
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.047874
+INFO:root:run dldv
+CRITICAL:root:iteration number: 34
+WARNING:root:Finished 'dLdv' in 0:03:29.886700
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.764954
+INFO:root:run dldv
+CRITICAL:root:iteration number: 35
+WARNING:root:Finished 'dLdv' in 0:03:28.340072
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.308039
+INFO:root:run dldv
+CRITICAL:root:iteration number: 36
+WARNING:root:Finished 'dLdv' in 0:03:26.275078
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.317553
+INFO:root:run dldv
+CRITICAL:root:iteration number: 37
+WARNING:root:Finished 'dLdv' in 0:03:30.290854
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.075699
+INFO:root:run dldv
+CRITICAL:root:iteration number: 38
+WARNING:root:Finished 'dLdv' in 0:03:30.158394
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.850194
+INFO:root:run dldv
+CRITICAL:root:iteration number: 39
+WARNING:root:Finished 'dLdv' in 0:03:33.046083
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.149177
+INFO:root:run dldv
+CRITICAL:root:iteration number: 40
+WARNING:root:Finished 'dLdv' in 0:03:32.341007
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.195088
+INFO:root:run dldv
+CRITICAL:root:iteration number: 41
+WARNING:root:Finished 'dLdv' in 0:03:32.882657
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.157047
+INFO:root:run dldv
+CRITICAL:root:iteration number: 42
+WARNING:root:Finished 'dLdv' in 0:03:31.617635
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.924800
+INFO:root:run dldv
+CRITICAL:root:iteration number: 43
+WARNING:root:Finished 'dLdv' in 0:03:33.256519
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.952958
+INFO:root:run dldv
+CRITICAL:root:iteration number: 44
+WARNING:root:Finished 'dLdv' in 0:03:31.441620
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.231228
+INFO:root:run dldv
+CRITICAL:root:iteration number: 45
+WARNING:root:Finished 'dLdv' in 0:03:32.254648
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:50.260146
+INFO:root:run dldv
+CRITICAL:root:iteration number: 46
+WARNING:root:Finished 'dLdv' in 0:03:31.696941
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:51.598066
+INFO:root:run dldv
+CRITICAL:root:iteration number: 47
+WARNING:root:Finished 'dLdv' in 0:03:31.719615
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:52.126525
+INFO:root:run dldv
+CRITICAL:root:iteration number: 48
+WARNING:root:Finished 'dLdv' in 0:03:33.546343
+DEBUG:root:End Now!!
+DEBUG:root:v is: [-0.22223146 -0.37507884  0.76359076 ...  0.00358306  0.09627488
+  0.03717411]
+DEBUG:root:Result of minimize is success
+DEBUG:root:Function called 48 times
+DEBUG:root:Number of iterations 45
+INFO:root:Initializing model
+INFO:root:Collecting features and tags
+INFO:root:Collected 22589 features and 36 tags
+INFO:root:Extracting features
+INFO:root:Extracted features for all words
+DEBUG:root:Start Now!!
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:38.151383
+INFO:root:run dldv
+CRITICAL:root:iteration number: 1
+WARNING:root:Finished 'dLdv' in 0:03:05.552960
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.761852
+INFO:root:run dldv
+CRITICAL:root:iteration number: 2
+WARNING:root:Finished 'dLdv' in 0:03:21.105530
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.669083
+INFO:root:run dldv
+CRITICAL:root:iteration number: 3
+WARNING:root:Finished 'dLdv' in 0:03:20.036810
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.243363
+INFO:root:run dldv
+CRITICAL:root:iteration number: 4
+WARNING:root:Finished 'dLdv' in 0:03:21.407432
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.415109
+INFO:root:run dldv
+CRITICAL:root:iteration number: 5
+WARNING:root:Finished 'dLdv' in 0:03:21.986109
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.747660
+INFO:root:run dldv
+CRITICAL:root:iteration number: 6
+WARNING:root:Finished 'dLdv' in 0:03:22.221629
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.912752
+INFO:root:run dldv
+CRITICAL:root:iteration number: 7
+WARNING:root:Finished 'dLdv' in 0:03:21.696694
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.056531
+INFO:root:run dldv
+CRITICAL:root:iteration number: 8
+WARNING:root:Finished 'dLdv' in 0:03:21.401906
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.856578
+INFO:root:run dldv
+CRITICAL:root:iteration number: 9
+WARNING:root:Finished 'dLdv' in 0:03:20.091436
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.790465
+INFO:root:run dldv
+CRITICAL:root:iteration number: 10
+WARNING:root:Finished 'dLdv' in 0:03:19.852805
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.668551
+INFO:root:run dldv
+CRITICAL:root:iteration number: 11
+WARNING:root:Finished 'dLdv' in 0:03:19.749473
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.559585
+INFO:root:run dldv
+CRITICAL:root:iteration number: 12
+WARNING:root:Finished 'dLdv' in 0:03:18.151704
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.098095
+INFO:root:run dldv
+CRITICAL:root:iteration number: 13
+WARNING:root:Finished 'dLdv' in 0:03:17.446303
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.882625
+INFO:root:run dldv
+CRITICAL:root:iteration number: 14
+WARNING:root:Finished 'dLdv' in 0:03:17.905762
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.702748
+INFO:root:run dldv
+CRITICAL:root:iteration number: 15
+WARNING:root:Finished 'dLdv' in 0:03:21.752035
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.166187
+INFO:root:run dldv
+CRITICAL:root:iteration number: 16
+WARNING:root:Finished 'dLdv' in 0:03:20.387116
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.322146
+INFO:root:run dldv
+CRITICAL:root:iteration number: 17
+WARNING:root:Finished 'dLdv' in 0:03:23.265829
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.453716
+INFO:root:run dldv
+CRITICAL:root:iteration number: 18
+WARNING:root:Finished 'dLdv' in 0:03:21.387537
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.018479
+INFO:root:run dldv
+CRITICAL:root:iteration number: 19
+WARNING:root:Finished 'dLdv' in 0:03:22.341765
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.535920
+INFO:root:run dldv
+CRITICAL:root:iteration number: 20
+WARNING:root:Finished 'dLdv' in 0:03:20.968286
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.858304
+INFO:root:run dldv
+CRITICAL:root:iteration number: 21
+WARNING:root:Finished 'dLdv' in 0:03:21.715766
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.144964
+INFO:root:run dldv
+CRITICAL:root:iteration number: 22
+WARNING:root:Finished 'dLdv' in 0:03:23.187424
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.196747
+INFO:root:run dldv
+CRITICAL:root:iteration number: 23
+WARNING:root:Finished 'dLdv' in 0:03:21.139166
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.690893
+INFO:root:run dldv
+CRITICAL:root:iteration number: 24
+WARNING:root:Finished 'dLdv' in 0:03:22.828977
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.234049
+INFO:root:run dldv
+CRITICAL:root:iteration number: 25
+WARNING:root:Finished 'dLdv' in 0:03:21.578318
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:49.357751
+INFO:root:run dldv
+CRITICAL:root:iteration number: 26
+WARNING:root:Finished 'dLdv' in 0:03:21.848505
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.970333
+INFO:root:run dldv
+CRITICAL:root:iteration number: 27
+WARNING:root:Finished 'dLdv' in 0:03:21.259841
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.822640
+INFO:root:run dldv
+CRITICAL:root:iteration number: 28
+WARNING:root:Finished 'dLdv' in 0:03:21.940182
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.284108
+INFO:root:run dldv
+CRITICAL:root:iteration number: 29
+WARNING:root:Finished 'dLdv' in 0:03:20.071930
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.620797
+INFO:root:run dldv
+CRITICAL:root:iteration number: 30
+WARNING:root:Finished 'dLdv' in 0:03:21.308557
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.504860
+INFO:root:run dldv
+CRITICAL:root:iteration number: 31
+WARNING:root:Finished 'dLdv' in 0:03:20.615165
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.084094
+INFO:root:run dldv
+CRITICAL:root:iteration number: 32
+WARNING:root:Finished 'dLdv' in 0:03:20.860290
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.523490
+INFO:root:run dldv
+CRITICAL:root:iteration number: 33
+WARNING:root:Finished 'dLdv' in 0:03:22.199838
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.291304
+INFO:root:run dldv
+CRITICAL:root:iteration number: 34
+WARNING:root:Finished 'dLdv' in 0:03:22.443164
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.915242
+INFO:root:run dldv
+CRITICAL:root:iteration number: 35
+WARNING:root:Finished 'dLdv' in 0:03:21.163744
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.474567
+INFO:root:run dldv
+CRITICAL:root:iteration number: 36
+WARNING:root:Finished 'dLdv' in 0:03:20.840022
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.080596
+INFO:root:run dldv
+CRITICAL:root:iteration number: 37
+WARNING:root:Finished 'dLdv' in 0:03:21.996604
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.923838
+INFO:root:run dldv
+CRITICAL:root:iteration number: 38
+WARNING:root:Finished 'dLdv' in 0:03:20.374556
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.551590
+INFO:root:run dldv
+CRITICAL:root:iteration number: 39
+WARNING:root:Finished 'dLdv' in 0:03:21.620603
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.151395
+INFO:root:run dldv
+CRITICAL:root:iteration number: 40
+WARNING:root:Finished 'dLdv' in 0:03:21.417016
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.560835
+INFO:root:run dldv
+CRITICAL:root:iteration number: 41
+WARNING:root:Finished 'dLdv' in 0:03:20.500481
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.616520
+INFO:root:run dldv
+CRITICAL:root:iteration number: 42
+WARNING:root:Finished 'dLdv' in 0:03:22.185262
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.475709
+INFO:root:run dldv
+CRITICAL:root:iteration number: 43
+WARNING:root:Finished 'dLdv' in 0:03:21.041931
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.322221
+INFO:root:run dldv
+CRITICAL:root:iteration number: 44
+WARNING:root:Finished 'dLdv' in 0:03:21.310833
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.944767
+INFO:root:run dldv
+CRITICAL:root:iteration number: 45
+WARNING:root:Finished 'dLdv' in 0:03:19.819368
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.584219
+INFO:root:run dldv
+CRITICAL:root:iteration number: 46
+WARNING:root:Finished 'dLdv' in 0:03:20.611895
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:47.749423
+INFO:root:run dldv
+CRITICAL:root:iteration number: 47
+WARNING:root:Finished 'dLdv' in 0:03:22.702158
+INFO:root:run L(v)
+WARNING:root:Finished 'L' in 0:00:48.841945
+INFO:root:run dldv
+CRITICAL:root:iteration number: 48
+WARNING:root:Finished 'dLdv' in 0:03:21.992884
+DEBUG:root:End Now!!
+DEBUG:root:v is: [-0.22223146 -0.37507884  0.76359076 ...  0.00358306  0.09627488
+  0.03717411]
+DEBUG:root:Result of minimize is success
+DEBUG:root:Function called 48 times
+DEBUG:root:Number of iterations 45
+INFO:root:Model already trained.
+INFO:root:Model already trained.
+INFO:root:Model already trained.
+INFO:root:Model already trained.
+INFO:root:Initializing model

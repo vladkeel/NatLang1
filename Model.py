@@ -52,6 +52,7 @@ def timer(func):
 class Model:
     def __init__(self, dir, is_test=False):
         self.dir = dir
+        self.is_test = is_test
         if is_test:
             self.v = np.load(os.path.join(self.dir, 'v.npy'))
             with open(os.path.join(dir, 'int_to_tag'), 'rb') as f:
@@ -87,6 +88,7 @@ class Model:
         self.v = None
 
     def clear(self):
+        self.is_test = False
         self.word_tag_dict = {}
         self.iteration_number = 1
         self.set_of_tags = set()
@@ -161,6 +163,9 @@ class Model:
         np.save(os.path.join(self.dir, 'v'), self.v)
 
     def train(self, train_data):
+        if self.is_test:
+            logger.info("Model already trained.")
+            return
         logger.info("Collecting features and tags")
         tag_enum = 0
         for sentence in train_data:
@@ -279,15 +284,18 @@ class Model:
             ret_tags[i] = tag
         return ret_tags
 
-    def test(self, train_file, test_file):
+    def test(self, train_file, test_file, f):
         pass
 
     def comp(self, comp_file):
         test = prs.comp_pars(comp_file)
         res_rows = []
+        iterat = 1
         for sentence in test:
             words = [sentence[i][0] for i in range(len(sentence))]
             tags = self.infer(sentence)
             res_rows.append(prs.results_row(words, tags))
+            progress_bar(iterat/len(test), "Completed {} of {} competition sentences".format(iterat, len(test)))
+            iterat += 1
         prs.write_results('res_{}'.format(comp_file), res_rows)
 
