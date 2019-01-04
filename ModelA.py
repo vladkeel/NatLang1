@@ -156,10 +156,11 @@ class ModelA(Model):
                 if tags[j] in self.set_of_tags and tags_result[j] in self.set_of_tags:
                     cnf_matrix[self.tag_to_int[tags[j]]][self.tag_to_int[tags_result[j]]] += 1
             progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
+        print()
         sum_good = sum([cnf_matrix[i][i] for i in range(len(self.set_of_tags))])
         sum_all = cnf_matrix.sum()
         result_accuracy = sum_good/sum_all
-        f.write("Confusion matrix:")
-        str_mat = '\n'.join('\t'.join('%0.0f' %x for x in y) for y in cnf_matrix)
-        f.write(str_mat)
-        f.write("Accuracy: {}".format(result_accuracy))
+        print("Confusion matrix:", file=f)
+        str_mat = '\n'.join(' '.join('%0.0f' %x for x in y) for y in cnf_matrix)
+        print(str_mat, file=f)
+        print("Accuracy: {}".format(result_accuracy), file=f)

@@ -11,7 +11,6 @@ from scipy.sparse import hstack
 import sys
 import pickle
 import os
-logging.basicConfig(filename='logger.txt', level=logging.DEBUG)
 logger = logging.getLogger()
 coloredlogs.install(level='DEBUG')
 coloredlogs.install(level='DEBUG', logger=logger)
@@ -194,6 +193,8 @@ class Model:
                 self.feature_collector(self.train_sentences[i], self.train_tags[i], self.train_tags[i][idx], idx)
             progress_bar(i / len(self.train_sentences),
                          "completed {} of {} sentences".format(i, len(self.train_sentences)))
+        progress_bar(1, "")
+        print()
         set_of_useful_features = [k for k, v in self.set_of_features.items() if float(v) >= 5]
         self.int = 0
         for key in set_of_useful_features:
@@ -220,6 +221,8 @@ class Model:
                                                                               self.train_tags[i][idx - 2] if idx > 1 else '*',
                                                                               idx))
             progress_bar(i/len(self.train_sentences), "completed {} of {} sentences".format(i, len(self.train_sentences)))
+        progress_bar(1)
+        print()
         logger.info("Extracted features for all words")
         logger.debug('Start Now!!')
         self.v, f, d = minimize(self.L, np.zeros(self.int), factr=1e12, pgtol=1e-3, fprime=self.dLdv)
@@ -297,5 +300,6 @@ class Model:
             res_rows.append(prs.results_row(words, tags))
             progress_bar(iterat/len(test), "Completed {} of {} competition sentences".format(iterat, len(test)))
             iterat += 1
+        print()
         prs.write_results('res_{}'.format(comp_file), res_rows)
 

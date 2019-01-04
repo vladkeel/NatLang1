@@ -28,5 +28,5 @@ def results_row(words, tags):
 def write_results(filename, rows):
     with open("{}.wtag".format(filename), 'w') as f:
         for row in rows:
-            f.write(row)
+            print(row, file=f)
 
