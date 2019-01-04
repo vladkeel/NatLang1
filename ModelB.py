@@ -161,7 +161,7 @@ class ModelB(Model):
                 for j in range(len(tags)):
                     if tags[j] in self.set_of_tags and tags_result[j] in self.set_of_tags:
                         cnf_matrix[self.tag_to_int[tags[j]]][self.tag_to_int[tags_result[j]]] += 1
-                progress_bar(i / len(test), " Inferring sentence: {} from: {}".format(i, len(test)))
+                progress_bar(i / fold_size, " Inferring sentence: {} from: {}".format(i, fold_size))
             sum_good = sum([cnf_matrix[i][i] for i in range(len(self.set_of_tags))])
             sum_all = cnf_matrix.sum()
             sum_acc += sum_good / sum_all
