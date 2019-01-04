@@ -150,8 +150,8 @@ class ModelB(Model):
         fold_size = np.floor(test_size / 7)
         sum_acc = 0
         for k in range(7):
-            cv_test = test[k*fold_size:k*fold_size + fold_size]
-            cv_train = test[:k*fold_size] + test[k*fold_size + fold_size:]
+            cv_test = test[int(k*fold_size):int(k*fold_size + fold_size)]
+            cv_train = test[:int(k*fold_size)] + test[int(k*fold_size + fold_size):]
             self.clear()
             self.train(cv_train)
             cnf_matrix = np.zeros((len(self.set_of_tags), len(self.set_of_tags)))
