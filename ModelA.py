@@ -166,3 +166,12 @@ class ModelA(Model):
         str_mat = '\n'.join(' '.join('%0.0f' %x for x in y) for y in cnf_matrix)
         print(str_mat, file=f)
         print("Accuracy: {}".format(result_accuracy), file=f)
+        work_mat = cnf_matrix
+        for i in range(len(self.set_of_tags)):
+            work_mat[i][i] = 0
+        flat_indices = np.argpartition(work_mat.ravel(), -10)[-10:]
+        row_indices, col_indices = np.unravel_index(flat_indices, work_mat.shape)
+        for i in range(10):
+            print("{} was mistaken for {} - {} times".format(self.int_to_tag[row_indices[i]],
+                                                             self.int_to_tag[col_indices[i]],
+                                                             work_mat[row_indices[i]][col_indices[i]]), file=f)

@@ -165,4 +165,4 @@ class ModelB(Model):
             sum_good = sum([cnf_matrix[i][i] for i in range(len(self.set_of_tags))])
             sum_all = cnf_matrix.sum()
             sum_acc += sum_good / sum_all
-        print("Accuracy: ".format(sum_acc / 7), file=f)
+        print("Accuracy: {}".format(sum_acc / 7), file=f)

@@ -221,7 +221,7 @@ class Model:
                                                                               self.train_tags[i][idx - 2] if idx > 1 else '*',
                                                                               idx))
             progress_bar(i/len(self.train_sentences), "completed {} of {} sentences".format(i, len(self.train_sentences)))
-        progress_bar(1)
+        progress_bar(1, "")
         print()
         logger.info("Extracted features for all words")
         logger.debug('Start Now!!')
